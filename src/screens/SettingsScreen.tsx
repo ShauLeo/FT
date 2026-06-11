@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import PressableScale from '../components/PressableScale';
 import { Card, Screen, ScreenTitle, SectionTitle } from '../components/ui';
 import { providers } from '../health';
 import { Palette } from '../theme';
@@ -13,43 +15,10 @@ const MODES: { value: ThemeMode; label: string }[] = [
   { value: 'dark', label: 'Dark' },
 ];
 
-const DEVICE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  'apple-health': 'watch',
-  whoop: 'fitness',
-  garmin: 'navigate',
-  coros: 'compass',
-  fitbit: 'pulse',
-  strava: 'trail-sign',
-};
-
 export default function SettingsScreen() {
   const { colors, mode, setMode } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
-  const [availability, setAvailability] = useState<Record<string, boolean>>({});
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    Promise.all(
-      providers.map(async (p) => [p.id, await p.isAvailable()] as const)
-    ).then((entries) => {
-      if (!cancelled) setAvailability(Object.fromEntries(entries));
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const onConnect = async (id: string) => {
-    const provider = providers.find((p) => p.id === id);
-    if (!provider) return;
-    try {
-      await provider.connect();
-      setStatusMessage(`${provider.name} connected.`);
-    } catch (e) {
-      setStatusMessage(e instanceof Error ? e.message : 'Connection failed.');
-    }
-  };
+  const navigation = useNavigation<any>();
 
   return (
     <Screen>
@@ -77,45 +46,35 @@ export default function SettingsScreen() {
 
       <Card>
         <SectionTitle>DEVICES & DATA SOURCES</SectionTitle>
-        {providers.map((p, i) => {
-          const available = availability[p.id] ?? false;
-          return (
-            <View
-              key={p.id}
-              style={[styles.deviceRow, i < providers.length - 1 && styles.deviceDivider]}
-            >
-              <View style={styles.deviceIconWrap}>
-                <Ionicons
-                  name={DEVICE_ICONS[p.id] ?? 'radio'}
-                  size={16}
-                  color={colors.textSecondary}
-                />
-              </View>
-              <View style={styles.deviceInfo}>
-                <Text style={styles.deviceName}>{p.name}</Text>
-                <Text style={styles.deviceMeta}>
-                  {p.transport} · {available ? 'available' : 'needs setup'}
-                </Text>
-              </View>
-              <Pressable style={styles.connectBtn} onPress={() => onConnect(p.id)}>
-                <Text style={styles.connectText}>Connect</Text>
-              </Pressable>
+        <PressableScale
+          accessibilityLabel="Connect a device"
+          onPress={() => navigation.navigate('ConnectDevice')}
+        >
+          <View style={styles.connectRow}>
+            <View style={styles.connectIconWrap}>
+              <Ionicons name="add" size={20} color={colors.accent} />
             </View>
-          );
-        })}
-        {statusMessage ? <Text style={styles.status}>{statusMessage}</Text> : null}
+            <View style={styles.connectInfo}>
+              <Text style={styles.connectTitle}>Connect device</Text>
+              <Text style={styles.connectMeta}>
+                {providers.length} sources: Apple Watch, Whoop, Garmin, Coros, Fitbit, Strava
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+          </View>
+        </PressableScale>
         <Text style={styles.note}>
-          The app currently shows demo data. Apple Watch (HealthKit) is the first planned
-          live source — it needs a custom iOS build via EAS. Whoop, Garmin, Coros and
-          Fitbit connect through their cloud APIs. See docs/HEALTH_INTEGRATION.md.
+          The app currently shows demo data. Apple Watch (HealthKit) is the first planned live
+          source — see docs/HEALTH_INTEGRATION.md.
         </Text>
       </Card>
 
       <Card>
         <SectionTitle>ABOUT</SectionTitle>
         <Text style={styles.note}>
-          Fitness Tracker demo — a Whoop × Bevel × Garmin feature mix built with Expo.
-          Metric models inspired by the open-source goose project (github.com/b-nnett/goose).
+          Fitness Tracker demo — the aessence.co companion app, mixing Whoop, Bevel and Garmin
+          features. Metric models inspired by the open-source goose project
+          (github.com/b-nnett/goose).
         </Text>
       </Card>
     </Screen>
@@ -134,7 +93,8 @@ const makeStyles = (c: Palette) =>
       alignItems: 'center',
       borderRadius: 10,
       flex: 1,
-      paddingVertical: 8,
+      minHeight: 38,
+      justifyContent: 'center',
     },
     segmentItemActive: {
       backgroundColor: c.card,
@@ -147,52 +107,32 @@ const makeStyles = (c: Palette) =>
     segmentTextActive: {
       color: c.textPrimary,
     },
-    deviceRow: {
+    connectRow: {
       alignItems: 'center',
       flexDirection: 'row',
-      paddingVertical: 10,
+      minHeight: 48,
     },
-    deviceDivider: {
-      borderBottomColor: c.cardBorder,
-      borderBottomWidth: 1,
-    },
-    deviceIconWrap: {
+    connectIconWrap: {
       alignItems: 'center',
       backgroundColor: c.track,
-      borderRadius: 16,
-      height: 32,
+      borderRadius: 18,
+      height: 36,
       justifyContent: 'center',
       marginRight: 12,
-      width: 32,
+      width: 36,
     },
-    deviceInfo: {
+    connectInfo: {
       flex: 1,
     },
-    deviceName: {
+    connectTitle: {
       color: c.textPrimary,
       fontSize: 14,
       fontWeight: '700',
     },
-    deviceMeta: {
+    connectMeta: {
       color: c.textTertiary,
       fontSize: 11,
       marginTop: 2,
-    },
-    connectBtn: {
-      backgroundColor: c.accent,
-      borderRadius: 10,
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-    },
-    connectText: {
-      color: '#FFFFFF',
-      fontSize: 12,
-      fontWeight: '700',
-    },
-    status: {
-      color: c.recoveryYellow,
-      fontSize: 12,
-      marginTop: 10,
     },
     note: {
       color: c.textSecondary,

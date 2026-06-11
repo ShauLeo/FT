@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import PressableScale from '../components/PressableScale';
 import { Card, Screen, ScreenTitle, SectionTitle } from '../components/ui';
 import WhoopAgeCard from '../components/WhoopAgeCard';
 import {
@@ -13,6 +15,7 @@ import {
   week,
   whoopAge,
 } from '../data/mockData';
+import { MetricId } from '../data/metrics';
 import { Palette, recoveryColor } from '../theme';
 import { useTheme } from '../ThemeContext';
 
@@ -26,6 +29,8 @@ const STAGE_COLORS = (c: Palette) => ({
 export default function BiologyScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const navigation = useNavigation<any>();
+  const openMetric = (metricId: MetricId) => navigation.navigate('MetricDetail', { metricId });
 
   const stages = [
     { name: 'Awake' as const, minutes: sleepDetail.stages.awakeMinutes },
@@ -36,12 +41,12 @@ export default function BiologyScreen() {
   const totalStageMinutes = stages.reduce((sum, s) => sum + s.minutes, 0);
   const stageColors = STAGE_COLORS(colors);
 
-  const vitals = [
-    { label: 'HRV', value: `${today.hrv} ms` },
-    { label: 'RESTING HR', value: `${today.restingHr} bpm` },
-    { label: 'RESP. RATE', value: `${sleepDetail.respiratoryRate} /min` },
-    { label: 'SPO2', value: `${sleepDetail.spo2}%` },
-    { label: 'WRIST TEMP', value: `${sleepDetail.wristTempDeltaC > 0 ? '+' : ''}${sleepDetail.wristTempDeltaC}°C` },
+  const vitals: { label: string; value: string; metric?: MetricId }[] = [
+    { label: 'HRV', value: `${today.hrv} ms`, metric: 'hrv' },
+    { label: 'RESTING HR', value: `${today.restingHr} bpm`, metric: 'rhr' },
+    { label: 'RESP. RATE', value: `${sleepDetail.respiratoryRate} /min`, metric: 'resp' },
+    { label: 'SPO2', value: `${sleepDetail.spo2}%`, metric: 'spo2' },
+    { label: 'WRIST TEMP', value: `${sleepDetail.wristTempDeltaC > 0 ? '+' : ''}${sleepDetail.wristTempDeltaC}°C`, metric: 'temp' },
     { label: 'HR DIP', value: `${sleepDetail.hrDipPercent}%` },
   ];
 
@@ -165,12 +170,27 @@ export default function BiologyScreen() {
       <Card>
         <SectionTitle>RECOVERY VITALS</SectionTitle>
         <View style={styles.vitalsGrid}>
-          {vitals.map((v) => (
-            <View key={v.label} style={styles.vitalCell}>
-              <Text style={styles.vitalValue}>{v.value}</Text>
-              <Text style={styles.vitalLabel}>{v.label}</Text>
-            </View>
-          ))}
+          {vitals.map((v) =>
+            v.metric ? (
+              <PressableScale
+                key={v.label}
+                style={styles.vitalCell}
+                accessibilityLabel={`${v.label} detail`}
+                onPress={() => openMetric(v.metric!)}
+              >
+                <Text style={styles.vitalValue}>{v.value}</Text>
+                <View style={styles.vitalLabelRow}>
+                  <Text style={styles.vitalLabel}>{v.label}</Text>
+                  <Ionicons name="chevron-forward" size={10} color={colors.textTertiary} />
+                </View>
+              </PressableScale>
+            ) : (
+              <View key={v.label} style={styles.vitalCell}>
+                <Text style={styles.vitalValue}>{v.value}</Text>
+                <Text style={styles.vitalLabel}>{v.label}</Text>
+              </View>
+            )
+          )}
         </View>
       </Card>
 
@@ -356,6 +376,11 @@ const makeStyles = (c: Palette) =>
       fontWeight: '600',
       letterSpacing: 0.8,
       marginTop: 2,
+    },
+    vitalLabelRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: 2,
     },
     weekRow: {
       alignItems: 'flex-end',

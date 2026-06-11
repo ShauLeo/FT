@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 
+import PressableScale from '../components/PressableScale';
 import { Card, Screen, SectionTitle } from '../components/ui';
-import { aessenceBenefits, aessenceTiers } from '../data/mockData';
+import { aessenceBenefits, aessenceTiers, aessenceWelcomeBundle } from '../data/mockData';
 import { Palette, radius, spacing } from '../theme';
 import { useTheme } from '../ThemeContext';
 
@@ -11,6 +12,8 @@ export default function ShopScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [selected, setSelected] = useState('athlete');
+
+  const openQuiz = () => Linking.openURL('https://aessence.co/');
 
   return (
     <Screen>
@@ -23,21 +26,21 @@ export default function ShopScreen() {
         <Text style={styles.heroSub}>
           A personal supplement formula and training program, built from your goals and your data.
         </Text>
-        <Pressable
-          style={styles.quizBtn}
-          accessibilityLabel="Start the aessence quiz"
-          onPress={() => Linking.openURL('https://aessence.co/')}
-        >
-          <Text style={styles.quizBtnText}>Build my formula</Text>
-          <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
-        </Pressable>
-        <Text style={styles.quizHint}>2-minute quiz · 40,000+ formulas built · 4.9★</Text>
+        <PressableScale accessibilityLabel="Start the aessence quiz" onPress={openQuiz}>
+          <View style={styles.quizBtn}>
+            <Text style={styles.quizBtnText}>Build my formula</Text>
+            <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+          </View>
+        </PressableScale>
+        <Text style={styles.quizHint}>
+          ✓ No card required · ✓ 2 minutes · ✓ 30-day guarantee
+        </Text>
       </View>
 
       {aessenceTiers.map((tier) => {
         const active = selected === tier.id;
         return (
-          <Pressable
+          <PressableScale
             key={tier.id}
             onPress={() => setSelected(tier.id)}
             accessibilityLabel={`Select ${tier.name} plan`}
@@ -51,17 +54,21 @@ export default function ShopScreen() {
               <View style={styles.tierHead}>
                 <View style={styles.tierTitleRow}>
                   <Text style={styles.tierName}>{tier.name}</Text>
-                  {tier.popular ? (
+                  {tier.badge ? (
                     <View style={styles.popularBadge}>
-                      <Text style={styles.popularText}>MOST POPULAR</Text>
+                      <Text style={styles.popularText}>{tier.badge}</Text>
                     </View>
                   ) : null}
                 </View>
-                <View style={styles.priceCol}>
-                  <Text style={styles.tierPrice}>{tier.pricePerMonth}</Text>
-                  <Text style={styles.perMonth}>/month</Text>
-                </View>
               </View>
+              {/* Website pricing: per-day hero, per-month below */}
+              <View style={styles.priceRow}>
+                <Text style={styles.dayPrice}>{tier.pricePerDay}</Text>
+                <Text style={styles.dayUnit}>/ day</Text>
+              </View>
+              <Text style={styles.monthPrice}>
+                {tier.pricePerMonth} / month · cancel anytime
+              </Text>
               <Text style={styles.tierTagline}>{tier.tagline}</Text>
               {tier.features.map((f) => (
                 <View key={f} style={styles.featureRow}>
@@ -69,10 +76,29 @@ export default function ShopScreen() {
                   <Text style={styles.featureText}>{f}</Text>
                 </View>
               ))}
+              {active ? (
+                <PressableScale accessibilityLabel={`Start ${tier.name}`} onPress={openQuiz}>
+                  <View style={styles.startBtn}>
+                    <Text style={styles.startBtnText}>Start {tier.name}</Text>
+                  </View>
+                </PressableScale>
+              ) : null}
             </Card>
-          </Pressable>
+          </PressableScale>
         );
       })}
+
+      <Card style={{ borderColor: colors.brand, borderStyle: 'dashed' }}>
+        <View style={styles.bundleHead}>
+          <Ionicons name="gift" size={18} color={colors.brand} />
+          <Text style={styles.bundleTitle}>Welcome Value Bonus</Text>
+          <View style={styles.bundleValueBadge}>
+            <Text style={styles.bundleValueText}>{aessenceWelcomeBundle.value} FREE</Text>
+          </View>
+        </View>
+        <Text style={styles.bundleItems}>{aessenceWelcomeBundle.items.join(' · ')}</Text>
+        <Text style={styles.bundleNote}>{aessenceWelcomeBundle.note}</Text>
+      </Card>
 
       <Card>
         <SectionTitle>WHY AESSENCE</SectionTitle>
@@ -82,6 +108,10 @@ export default function ShopScreen() {
             <Text style={styles.benefitText}>{b.text}</Text>
           </View>
         ))}
+        <View style={styles.guaranteeRow}>
+          <Ionicons name="shield-checkmark" size={14} color={colors.recoveryGreen} />
+          <Text style={styles.guaranteeText}>30-day money-back guarantee</Text>
+        </View>
       </Card>
     </Screen>
   );
@@ -163,24 +193,34 @@ const makeStyles = (c: Palette) =>
       fontWeight: '800',
       letterSpacing: 0.6,
     },
-    priceCol: {
+    priceRow: {
       alignItems: 'flex-end',
+      flexDirection: 'row',
+      gap: 4,
+      marginTop: 8,
     },
-    tierPrice: {
+    dayPrice: {
       color: c.textPrimary,
-      fontSize: 18,
+      fontSize: 30,
       fontWeight: '800',
       fontVariant: ['tabular-nums'],
     },
-    perMonth: {
+    dayUnit: {
+      color: c.textSecondary,
+      fontSize: 14,
+      fontWeight: '600',
+      paddingBottom: 4,
+    },
+    monthPrice: {
       color: c.textTertiary,
-      fontSize: 11,
+      fontSize: 12,
+      marginTop: 2,
     },
     tierTagline: {
       color: c.textSecondary,
       fontSize: 12,
       marginBottom: 10,
-      marginTop: 2,
+      marginTop: 8,
     },
     featureRow: {
       alignItems: 'center',
@@ -191,6 +231,51 @@ const makeStyles = (c: Palette) =>
     featureText: {
       color: c.textSecondary,
       fontSize: 13,
+    },
+    startBtn: {
+      alignItems: 'center',
+      backgroundColor: c.brand,
+      borderRadius: 12,
+      justifyContent: 'center',
+      marginTop: 12,
+      minHeight: 46,
+    },
+    startBtnText: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    bundleHead: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: 8,
+    },
+    bundleTitle: {
+      color: c.textPrimary,
+      flex: 1,
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    bundleValueBadge: {
+      backgroundColor: c.brand,
+      borderRadius: 8,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+    },
+    bundleValueText: {
+      color: '#FFFFFF',
+      fontSize: 10,
+      fontWeight: '800',
+    },
+    bundleItems: {
+      color: c.textSecondary,
+      fontSize: 12,
+      marginTop: 8,
+    },
+    bundleNote: {
+      color: c.textTertiary,
+      fontSize: 11,
+      marginTop: 4,
     },
     benefitRow: {
       alignItems: 'center',
@@ -203,5 +288,19 @@ const makeStyles = (c: Palette) =>
       flex: 1,
       fontSize: 13,
       lineHeight: 18,
+    },
+    guaranteeRow: {
+      alignItems: 'center',
+      borderTopColor: c.cardBorder,
+      borderTopWidth: 1,
+      flexDirection: 'row',
+      gap: 8,
+      marginTop: 10,
+      paddingTop: 12,
+    },
+    guaranteeText: {
+      color: c.textSecondary,
+      fontSize: 12,
+      fontWeight: '600',
     },
   });

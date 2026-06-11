@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import PressableScale from '../components/PressableScale';
 import StrainCard from '../components/StrainCard';
 import { Card, Screen, ScreenTitle, SectionTitle } from '../components/ui';
 import {
@@ -54,12 +55,14 @@ export default function FitnessScreen() {
         <SectionTitle>STRENGTH</SectionTitle>
         <View style={styles.templateRow}>
           {strengthTemplates.map((t) => (
-            <Pressable key={t.id} style={styles.templateTile} accessibilityLabel={`Start ${t.name}`}>
-              <Ionicons name="barbell" size={16} color={colors.strainBlue} />
-              <Text style={styles.templateName}>{t.name}</Text>
-              <Text style={styles.templateMeta}>{t.exercises.length} exercises</Text>
-              <Text style={styles.templateMeta}>{t.lastPerformed}</Text>
-            </Pressable>
+            <PressableScale key={t.id} style={styles.flex} accessibilityLabel={`Start ${t.name}`}>
+              <View style={styles.templateTile}>
+                <Ionicons name="barbell" size={16} color={colors.strainBlue} />
+                <Text style={styles.templateName}>{t.name}</Text>
+                <Text style={styles.templateMeta}>{t.exercises.length} exercises</Text>
+                <Text style={styles.templateMeta}>{t.lastPerformed}</Text>
+              </View>
+            </PressableScale>
           ))}
         </View>
 
@@ -246,10 +249,12 @@ const makeStyles = (c: Palette) =>
       gap: 8,
       marginBottom: 14,
     },
+    flex: {
+      flex: 1,
+    },
     templateTile: {
       backgroundColor: c.track,
       borderRadius: 12,
-      flex: 1,
       gap: 2,
       padding: 10,
     },

@@ -148,10 +148,12 @@ export interface Macros {
 export interface AessenceTier {
   id: string;
   name: string;
+  /** Hero price like the website: per-day first */
+  pricePerDay: string;
   pricePerMonth: string;
   tagline: string;
   features: string[];
-  popular?: boolean;
+  badge?: string;
 }
 
 export interface TodayMetrics {
@@ -349,6 +351,7 @@ export const aessenceTiers: AessenceTier[] = [
   {
     id: 'essential',
     name: 'Essential',
+    pricePerDay: '€1.33',
     pricePerMonth: '€39.90',
     tagline: 'The foundation, clinically dosed',
     features: ['Creatine monohydrate', 'Performance multivitamin', 'Personal training program'],
@@ -356,6 +359,7 @@ export const aessenceTiers: AessenceTier[] = [
   {
     id: 'athlete',
     name: 'Athlete',
+    pricePerDay: '€2.33',
     pricePerMonth: '€69.90',
     tagline: 'Your formula, your program',
     features: [
@@ -363,11 +367,12 @@ export const aessenceTiers: AessenceTier[] = [
       '3 additional compounds for your goal',
       'Coaching notes with every refill',
     ],
-    popular: true,
+    badge: 'MOST POPULAR',
   },
   {
     id: 'elite',
     name: 'Elite',
+    pricePerDay: '€3.00',
     pricePerMonth: '€89.90',
     tagline: 'The full professional stack',
     features: [
@@ -376,8 +381,15 @@ export const aessenceTiers: AessenceTier[] = [
       'Quarterly formula refresh',
       'Priority coach access',
     ],
+    badge: 'MOST COMPLETE',
   },
 ];
+
+export const aessenceWelcomeBundle = {
+  value: '€84',
+  items: ['Shaker', 'Socks', 'Shirt', 'Blender', 'Handbook'],
+  note: 'Only available to the first 1,000 customers',
+};
 
 export const aessenceBenefits = [
   { icon: 'flask', text: 'Clinically dosed — no proprietary blends' },
