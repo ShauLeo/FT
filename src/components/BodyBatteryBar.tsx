@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-import { colors, radius, spacing } from '../theme';
+import { Palette, radius, spacing } from '../theme';
+import { useTheme } from '../ThemeContext';
 
 interface Props {
   level: number; // 0-100
@@ -11,6 +12,8 @@ interface Props {
 const BAR_HEIGHT = 14;
 
 export default function BodyBatteryBar({ level }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const clamped = Math.min(Math.max(level, 0), 100);
 
   return (
@@ -34,7 +37,7 @@ export default function BodyBatteryBar({ level }: Props) {
             width="100%"
             height={BAR_HEIGHT}
             rx={BAR_HEIGHT / 2}
-            fill={colors.trackDark}
+            fill={colors.track}
           />
           <Rect
             x="0"
@@ -51,37 +54,38 @@ export default function BodyBatteryBar({ level }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    padding: spacing.card,
-  },
-  headerRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  title: {
-    color: colors.textTertiary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-  },
-  value: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  barWrap: {
-    width: '100%',
-  },
-  hint: {
-    color: colors.textTertiary,
-    fontSize: 11,
-    marginTop: 8,
-  },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: c.card,
+      borderColor: c.cardBorder,
+      borderRadius: radius.card,
+      borderWidth: 1,
+      padding: spacing.card,
+    },
+    headerRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 10,
+    },
+    title: {
+      color: c.textTertiary,
+      fontSize: 12,
+      fontWeight: '700',
+      letterSpacing: 1.2,
+    },
+    value: {
+      color: c.textPrimary,
+      fontSize: 18,
+      fontWeight: '800',
+    },
+    barWrap: {
+      width: '100%',
+    },
+    hint: {
+      color: c.textTertiary,
+      fontSize: 11,
+      marginTop: 8,
+    },
+  });

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { colors, radius, spacing } from '../theme';
+import { Palette, radius, spacing } from '../theme';
+import { useTheme } from '../ThemeContext';
 
 interface Props {
   strain: number; // 0-21 (Whoop scale)
@@ -25,6 +26,9 @@ const gaugePath = (fraction: number): string => {
 };
 
 export default function StrainCard({ strain, target }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>STRAIN</Text>
@@ -32,7 +36,7 @@ export default function StrainCard({ strain, target }: Props) {
         <Svg width={W} height={H}>
           <Path
             d={gaugePath(1)}
-            stroke={colors.trackDark}
+            stroke={colors.track}
             strokeWidth={STROKE}
             strokeLinecap="round"
             fill="none"
@@ -54,35 +58,36 @@ export default function StrainCard({ strain, target }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    flex: 1,
-    padding: spacing.card,
-  },
-  title: {
-    color: colors.textTertiary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    marginBottom: 10,
-  },
-  gaugeWrap: {
-    alignItems: 'center',
-  },
-  value: {
-    color: colors.textPrimary,
-    fontSize: 24,
-    fontWeight: '800',
-    marginTop: -28,
-  },
-  target: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    marginTop: 10,
-    textAlign: 'center',
-  },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: c.card,
+      borderColor: c.cardBorder,
+      borderRadius: radius.card,
+      borderWidth: 1,
+      flex: 1,
+      padding: spacing.card,
+    },
+    title: {
+      color: c.textTertiary,
+      fontSize: 12,
+      fontWeight: '700',
+      letterSpacing: 1.2,
+      marginBottom: 10,
+    },
+    gaugeWrap: {
+      alignItems: 'center',
+    },
+    value: {
+      color: c.textPrimary,
+      fontSize: 24,
+      fontWeight: '800',
+      marginTop: -28,
+    },
+    target: {
+      color: c.textSecondary,
+      fontSize: 12,
+      marginTop: 10,
+      textAlign: 'center',
+    },
+  });
