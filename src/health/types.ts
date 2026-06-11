@@ -1,6 +1,13 @@
 import { DayMetrics, SleepDetail, TodayMetrics, Workout } from '../data/mockData';
 
-export type ProviderId = 'apple-health' | 'whoop' | 'garmin' | 'coros' | 'fitbit' | 'mock';
+export type ProviderId =
+  | 'apple-health'
+  | 'whoop'
+  | 'garmin'
+  | 'coros'
+  | 'fitbit'
+  | 'strava'
+  | 'mock';
 
 export interface HealthSnapshot {
   today: TodayMetrics;

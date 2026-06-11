@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -81,7 +82,9 @@ export default function FoodScreen() {
         <SectionTitle>TODAY'S MEALS</SectionTitle>
         {meals.map((m, i) => (
           <View key={m.id} style={[styles.mealRow, i < meals.length - 1 && styles.mealDivider]}>
-            <Text style={styles.mealIcon}>{m.icon}</Text>
+            <View style={styles.mealIconWrap}>
+              <Ionicons name={m.icon as any} size={16} color={colors.textSecondary} />
+            </View>
             <View style={styles.mealInfo}>
               <Text style={styles.mealName}>{m.name}</Text>
               <Text style={styles.mealTime}>{m.time}</Text>
@@ -160,9 +163,14 @@ const makeStyles = (c: Palette) =>
       borderBottomColor: c.cardBorder,
       borderBottomWidth: 1,
     },
-    mealIcon: {
-      fontSize: 20,
+    mealIconWrap: {
+      alignItems: 'center',
+      backgroundColor: c.track,
+      borderRadius: 16,
+      height: 32,
+      justifyContent: 'center',
       marginRight: 12,
+      width: 32,
     },
     mealInfo: {
       flex: 1,

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -16,12 +17,12 @@ export default function StatRow({ steps, calories }: Props) {
   return (
     <View style={styles.row}>
       <View style={styles.card}>
-        <Text style={styles.icon}>👟</Text>
+        <Ionicons name="footsteps" size={18} color={colors.textSecondary} style={styles.icon} />
         <Text style={styles.value}>{steps.toLocaleString('en-US')}</Text>
         <Text style={styles.label}>STEPS</Text>
       </View>
       <View style={styles.card}>
-        <Text style={styles.icon}>🔥</Text>
+        <Ionicons name="flame" size={18} color={colors.textSecondary} style={styles.icon} />
         <Text style={styles.value}>{calories.toLocaleString('en-US')}</Text>
         <Text style={styles.label}>CALORIES</Text>
       </View>
@@ -45,13 +46,13 @@ const makeStyles = (c: Palette) =>
       padding: spacing.card,
     },
     icon: {
-      fontSize: 18,
       marginBottom: 6,
     },
     value: {
       color: c.textPrimary,
       fontSize: 20,
       fontWeight: '800',
+      fontVariant: ['tabular-nums'],
     },
     label: {
       color: c.textTertiary,

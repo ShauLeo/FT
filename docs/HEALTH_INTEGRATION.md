@@ -73,6 +73,21 @@ score heuristics).
   use OAuth without review
 - REST endpoints for sleep stages, HRV, resting HR, steps, calories
 
+## Strava — workouts import/export
+
+- Register an API app at [developers.strava.com](https://developers.strava.com)
+  (free, instant for personal use; rate-limited)
+- OAuth 2.0 with `activity:read_all` (import) and `activity:write` (export) scopes
+- Import: `GET /api/v3/athlete/activities` → map to `Workout` (type, duration,
+  avg HR, calories); Strava has no strain score, so the app derives strain from
+  duration × HR zones
+- Export: `POST /api/v3/activities` to publish manually logged strength
+  sessions to the athlete's Strava feed
+- Token exchange needs a small backend or serverless function (same pattern as
+  Whoop/Fitbit); on mobile use `expo-auth-session` for the OAuth flow
+- UI entry points already exist: Connect/Import/Export buttons on the Fitness
+  tab and a Strava row in Settings → Devices
+
 ## Coros — Open API
 
 - Request access via the [COROS Open Platform](https://open.coros.com) (approval

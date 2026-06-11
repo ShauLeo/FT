@@ -1,8 +1,18 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Card, Screen, ScreenTitle, SectionTitle } from '../components/ui';
-import { formatDuration, sleepDetail, today, week } from '../data/mockData';
+import WhoopAgeCard from '../components/WhoopAgeCard';
+import {
+  formatDuration,
+  healthRanges,
+  sleepCoach,
+  sleepDetail,
+  today,
+  week,
+  whoopAge,
+} from '../data/mockData';
 import { Palette, recoveryColor } from '../theme';
 import { useTheme } from '../ThemeContext';
 
@@ -86,6 +96,70 @@ export default function BiologyScreen() {
             {formatDuration(sleepDetail.sleepDebtMinutes)}
           </Text>
         </View>
+      </Card>
+
+      <Card>
+        <SectionTitle>SLEEP COACH</SectionTitle>
+        <View style={styles.coachRow}>
+          <View style={styles.coachCell}>
+            <Ionicons name="moon" size={16} color={colors.sleepPurple} />
+            <Text style={styles.coachValue}>{sleepCoach.recommendedBedtime}</Text>
+            <Text style={styles.coachLabel}>BEDTIME</Text>
+          </View>
+          <View style={styles.coachCell}>
+            <Ionicons name="sunny" size={16} color={colors.recoveryYellow} />
+            <Text style={styles.coachValue}>{sleepCoach.recommendedWake}</Text>
+            <Text style={styles.coachLabel}>WAKE</Text>
+          </View>
+          <View style={styles.coachCell}>
+            <Ionicons name="flag" size={16} color={colors.accent} />
+            <Text style={styles.coachValue}>{sleepCoach.goal}</Text>
+            <Text style={styles.coachLabel}>GOAL</Text>
+          </View>
+        </View>
+        <Text style={styles.coachHint}>
+          In bed by {sleepCoach.recommendedBedtime} tonight meets your{' '}
+          {formatDuration(sleepCoach.sleepNeedMinutes)} sleep need to {sleepCoach.goal.toLowerCase()}{' '}
+          tomorrow.
+        </Text>
+      </Card>
+
+      <WhoopAgeCard age={whoopAge} />
+
+      <Card>
+        <SectionTitle>HEALTH MONITOR</SectionTitle>
+        {healthRanges.map((r) => {
+          const inRange = r.value >= r.low && r.value <= r.high;
+          const pct = Math.min(Math.max((r.value - r.low) / (r.high - r.low), 0), 1);
+          return (
+            <View key={r.metric} style={styles.rangeRow}>
+              <Text style={styles.rangeMetric}>{r.metric}</Text>
+              <View style={styles.rangeTrack}>
+                <View
+                  style={[
+                    styles.rangeMarker,
+                    {
+                      left: `${pct * 100}%`,
+                      backgroundColor: inRange ? colors.recoveryGreen : colors.recoveryRed,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.rangeValue}>
+                {r.value}
+                {r.unit === '%' ? '%' : ` ${r.unit}`}
+              </Text>
+              <Ionicons
+                name={inRange ? 'checkmark-circle' : 'alert-circle'}
+                size={16}
+                color={inRange ? colors.recoveryGreen : colors.recoveryRed}
+              />
+            </View>
+          );
+        })}
+        <Text style={styles.coachHint}>
+          Markers show where you sit inside your personal 30-day baseline range.
+        </Text>
       </Card>
 
       <Card>
@@ -200,6 +274,68 @@ const makeStyles = (c: Palette) =>
     debtValue: {
       fontSize: 16,
       fontWeight: '700',
+    },
+    coachRow: {
+      flexDirection: 'row',
+      marginBottom: 12,
+    },
+    coachCell: {
+      alignItems: 'center',
+      flex: 1,
+      gap: 4,
+    },
+    coachValue: {
+      color: c.textPrimary,
+      fontSize: 18,
+      fontWeight: '800',
+      fontVariant: ['tabular-nums'],
+    },
+    coachLabel: {
+      color: c.textTertiary,
+      fontSize: 10,
+      fontWeight: '600',
+      letterSpacing: 1,
+    },
+    coachHint: {
+      color: c.textTertiary,
+      fontSize: 11,
+      lineHeight: 16,
+      marginTop: 4,
+    },
+    rangeRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: 10,
+      marginBottom: 12,
+    },
+    rangeMetric: {
+      color: c.textSecondary,
+      fontSize: 12,
+      fontWeight: '600',
+      width: 78,
+    },
+    rangeTrack: {
+      backgroundColor: c.track,
+      borderRadius: 3,
+      flex: 1,
+      height: 6,
+    },
+    rangeMarker: {
+      borderRadius: 6,
+      height: 12,
+      marginLeft: -6,
+      marginTop: -3,
+      position: 'absolute',
+      top: '50%',
+      width: 12,
+    },
+    rangeValue: {
+      color: c.textPrimary,
+      fontSize: 12,
+      fontWeight: '700',
+      fontVariant: ['tabular-nums'],
+      textAlign: 'right',
+      width: 64,
     },
     vitalsGrid: {
       flexDirection: 'row',

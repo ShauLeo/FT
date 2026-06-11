@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -12,12 +13,13 @@ const MODES: { value: ThemeMode; label: string }[] = [
   { value: 'dark', label: 'Dark' },
 ];
 
-const DEVICE_ICONS: Record<string, string> = {
-  'apple-health': '⌚',
-  whoop: '🟢',
-  garmin: '🔵',
-  coros: '🟠',
-  fitbit: '🩵',
+const DEVICE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  'apple-health': 'watch',
+  whoop: 'fitness',
+  garmin: 'navigate',
+  coros: 'compass',
+  fitbit: 'pulse',
+  strava: 'trail-sign',
 };
 
 export default function SettingsScreen() {
@@ -82,7 +84,13 @@ export default function SettingsScreen() {
               key={p.id}
               style={[styles.deviceRow, i < providers.length - 1 && styles.deviceDivider]}
             >
-              <Text style={styles.deviceIcon}>{DEVICE_ICONS[p.id] ?? '📡'}</Text>
+              <View style={styles.deviceIconWrap}>
+                <Ionicons
+                  name={DEVICE_ICONS[p.id] ?? 'radio'}
+                  size={16}
+                  color={colors.textSecondary}
+                />
+              </View>
               <View style={styles.deviceInfo}>
                 <Text style={styles.deviceName}>{p.name}</Text>
                 <Text style={styles.deviceMeta}>
@@ -148,9 +156,14 @@ const makeStyles = (c: Palette) =>
       borderBottomColor: c.cardBorder,
       borderBottomWidth: 1,
     },
-    deviceIcon: {
-      fontSize: 20,
+    deviceIconWrap: {
+      alignItems: 'center',
+      backgroundColor: c.track,
+      borderRadius: 16,
+      height: 32,
+      justifyContent: 'center',
       marginRight: 12,
+      width: 32,
     },
     deviceInfo: {
       flex: 1,

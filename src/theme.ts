@@ -18,28 +18,34 @@ export interface Palette {
 
   track: string;
   accent: string;
+  /** Aessence brand orange — shop & commerce surfaces only */
+  brand: string;
+  stressPurple: string;
 }
 
+// Dark-first, Whoop-inspired: near-black surfaces, saturated signal colors
 export const darkPalette: Palette = {
-  background: '#0A0E14',
-  card: '#141A23',
-  cardBorder: '#1F2733',
-  textPrimary: '#F2F5F9',
-  textSecondary: '#8B96A5',
-  textTertiary: '#5C6675',
+  background: '#0B0D11',
+  card: '#15181E',
+  cardBorder: '#22262E',
+  textPrimary: '#F4F6F8',
+  textSecondary: '#949DA9',
+  textTertiary: '#636C78',
 
-  recoveryGreen: '#2DD4A7',
+  recoveryGreen: '#2DE5A2',
   recoveryYellow: '#F5C944',
   recoveryRed: '#F4615E',
-  strainBlue: '#4D9FFF',
+  strainBlue: '#1F9FFF',
   sleepPurple: '#9D7BFF',
 
   batteryLow: '#F4615E',
   batteryMid: '#F5C944',
-  batteryHigh: '#2DD4A7',
+  batteryHigh: '#2DE5A2',
 
-  track: '#222B38',
-  accent: '#4D9FFF',
+  track: '#242A33',
+  accent: '#1F9FFF',
+  brand: '#FF5A1F',
+  stressPurple: '#C77BFF',
 };
 
 export const lightPalette: Palette = {
@@ -62,6 +68,8 @@ export const lightPalette: Palette = {
 
   track: '#E6EBF2',
   accent: '#1E7FE8',
+  brand: '#E84A12',
+  stressPurple: '#8E4FD9',
 };
 
 export const recoveryColor = (score: number, c: Palette): string => {

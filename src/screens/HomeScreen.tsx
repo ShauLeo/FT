@@ -4,13 +4,16 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import BodyBatteryBar from '../components/BodyBatteryBar';
 import Header from '../components/Header';
+import JournalCard from '../components/JournalCard';
 import RecoveryRing from '../components/RecoveryRing';
 import SleepCard from '../components/SleepCard';
 import StatRow from '../components/StatRow';
 import StrainCard from '../components/StrainCard';
+import StressCard from '../components/StressCard';
 import WeekTrendStrip from '../components/WeekTrendStrip';
+import WhoopAgeCard from '../components/WhoopAgeCard';
 import { Screen } from '../components/ui';
-import { readinessSummary, today, week } from '../data/mockData';
+import { readinessSummary, stressToday, today, week, whoopAge } from '../data/mockData';
 import { spacing } from '../theme';
 
 export default function HomeScreen() {
@@ -34,10 +37,15 @@ export default function HomeScreen() {
           <StrainCard strain={today.strain} target={today.strainTarget} />
         </Pressable>
       </View>
+      <StressCard stress={stressToday} />
       <BodyBatteryBar level={today.bodyBattery} />
       <Pressable onPress={() => navigation.navigate('Fitness')}>
         <StatRow steps={today.steps} calories={today.calories} />
       </Pressable>
+      <Pressable onPress={() => navigation.navigate('Biology')}>
+        <WhoopAgeCard age={whoopAge} compact />
+      </Pressable>
+      <JournalCard />
       <WeekTrendStrip days={week} />
     </Screen>
   );

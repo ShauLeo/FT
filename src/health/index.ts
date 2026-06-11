@@ -28,6 +28,8 @@ export const providers: HealthProvider[] = [
   cloudStub('garmin', 'Garmin'),
   cloudStub('coros', 'Coros'),
   cloudStub('fitbit', 'Fitbit'),
+  // Strava is workouts-only: import activities, export logged workouts
+  cloudStub('strava', 'Strava'),
 ];
 
 /** The provider currently feeding the app's screens. */
